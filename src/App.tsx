@@ -15,7 +15,6 @@ import PatientRecordPage from "./pages/PatientRecordPage";
 import DemoCasesPage from "./pages/DemoCasesPage";
 import SharedReportPage from "./pages/SharedReportPage";
 import MobileUploadPage from "./pages/MobileUploadPage";
-import AnalyticsDashboardPage from "./pages/AnalyticsDashboardPage";
 import TriageQueuePage from "./pages/TriageQueuePage";
 import BillingPage from "./pages/BillingPage";
 import OrganizationPage from "./pages/OrganizationPage";
@@ -34,7 +33,7 @@ const App = () => (
           <Route path="/" element={<LandingPage />} />
           <Route path="/report/:scanId" element={<SharedReportPage />} />
           <Route element={<AppLayout />}>
-            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/dashboard" element={<AnalyticsDashboardPage />} />
             <Route path="/patients" element={<PatientsPage />} />
             <Route path="/patients/:patientId" element={<PatientRecordPage />} />
             <Route path="/upload" element={<UploadPage />} />
