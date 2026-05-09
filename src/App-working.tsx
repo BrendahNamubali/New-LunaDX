@@ -265,7 +265,7 @@ function LoginPage() {
 }
 
 // Simple Dashboard Placeholder
-function DashboardPage() {
+function AnalyticsDashboardPage() {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: theme.background }}>
       <Nav />
@@ -296,7 +296,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/" element={<LandingPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/dashboard" element={<AnalyticsDashboardPage />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
