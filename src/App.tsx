@@ -28,11 +28,14 @@ const App = () => (
 
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<div style={{ padding: 20, color: "black" }}>HOME TEST</div>} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/report/:scanId" element={<SharedReportPage />} />
 
-          <Route element={<AppLayout />}>
+          <Route
+  path="/dashboard"
+  element={<div style={{ padding: 20, color: "black" }}>LAYOUT TEST WORKS</div>}
+/>
             <Route path="/dashboard" element={<AnalyticsDashboardPage />} />
             <Route path="/patients" element={<PatientsPage />} />
             <Route path="/patients/:patientId" element={<PatientRecordPage />} />
