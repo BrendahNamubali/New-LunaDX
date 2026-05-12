@@ -169,3 +169,7 @@ export function getScanUsage() {
 }
 
 // ─────────────────────────────
+
+export function canUploadScans(role?: UserRole) {
+  return role === "Admin" || role === "Radiologist";
+}
