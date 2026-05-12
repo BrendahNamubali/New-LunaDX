@@ -1,5 +1,20 @@
 // src/lib/store.ts - Stable Frontend Store (SAFE FOR VERCEL)
 
+const safeLocalStorage = {
+  get(key: string) {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(key);
+  },
+  set(key: string, value: string) {
+    if (typeof window === "undefined") return;
+    localStorage.setItem(key, value);
+  },
+  remove(key: string) {
+    if (typeof window === "undefined") return;
+    localStorage.removeItem(key);
+  }
+};
+
 // ─────────────────────────────
 // Types
 // ─────────────────────────────
@@ -41,8 +56,15 @@ const SCANS_KEY = "lunadx_scans";
 // ─────────────────────────────
 
 export function getCurrentUser(): User {
-  const raw = localStorage.getItem(USER_KEY);
-  if (raw) return JSON.parse(raw);
+  const raw = safeLocalStorage.get(USER_KEY);
+
+  if (raw) {
+    try {
+      return JSON.parse(raw);
+    } catch {
+      // corrupted storage fallback
+    }
+  }
 
   return {
     id: "1",
@@ -60,12 +82,12 @@ export function login(email: string): User {
     role: "Admin",
   };
 
-  localStorage.setItem(USER_KEY, JSON.stringify(user));
+  safeLocalStorage.set(USER_KEY, JSON.stringify(user));
   return user;
 }
 
 export function logout() {
-  localStorage.removeItem(USER_KEY);
+  safeLocalStorage.remove(USER_KEY);
 }
 
 // ─────────────────────────────
@@ -85,20 +107,20 @@ export function canManageOrganization(role?: UserRole) {
 // ─────────────────────────────
 
 export function getPatients(): Patient[] {
-  return JSON.parse(localStorage.getItem(PATIENTS_KEY) || "[]");
+  return JSON.parse(safeLocalStorage.get(PATIENTS_KEY) || "[]");
 }
 
 export function savePatient(patient: Patient) {
   const patients = getPatients();
   patients.push(patient);
-  localStorage.setItem(PATIENTS_KEY, JSON.stringify(patients));
+  safeLocalStorage.set(PATIENTS_KEY, JSON.stringify(patients));
   return patient;
 }
 
 export function deletePatient(id: string) {
   const patients = getPatients();
   const updated = patients.filter((p) => p.id !== id);
-  localStorage.setItem(PATIENTS_KEY, JSON.stringify(updated));
+  safeLocalStorage.set(PATIENTS_KEY, JSON.stringify(updated));
 }
 
 // ─────────────────────────────
@@ -106,7 +128,7 @@ export function deletePatient(id: string) {
 // ─────────────────────────────
 
 export function getScans(): Scan[] {
-  return JSON.parse(localStorage.getItem(SCANS_KEY) || "[]");
+  return JSON.parse(safeLocalStorage.get(SCANS_KEY) || "[]");
 }
 
 export function getScanUsage() {
@@ -121,16 +143,16 @@ export function getScanUsage() {
 }
 
 export function saveScan(scan: any) {
-  const scans = getScans();
+  const scans = JSON.parse(safeLocalStorage.get(SCANS_KEY) || "[]");
 
   const newScan = {
-    id: crypto.randomUUID(),
+    id: crypto?.randomUUID?.() || Math.random().toString(36).slice(2),
     createdAt: new Date().toISOString(),
     ...scan,
   };
 
   scans.push(newScan);
-  localStorage.setItem(SCANS_KEY, JSON.stringify(scans));
+  safeLocalStorage.set(SCANS_KEY, JSON.stringify(scans));
 
   return newScan;
 }
@@ -162,7 +184,7 @@ export function createOrganization(data: {
     role: "Admin",
   };
 
-  localStorage.setItem(USER_KEY, JSON.stringify(user));
+  safeLocalStorage.set(USER_KEY, JSON.stringify(user));
 
   return {
     org: {
@@ -200,12 +222,12 @@ export function simulateAI() {
 }
 
 export function updateScanNotes(scanId: string, notes: string) {
-  const scans = JSON.parse(localStorage.getItem("lunadx_scans") || "[]");
+  const scans = JSON.parse(safeLocalStorage.get("lunadx_scans") || "[]");
 
   const updated = scans.map((s: any) =>
     s.id === scanId ? { ...s, notes } : s
   );
 
-  localStorage.setItem("lunadx_scans", JSON.stringify(updated));
+  safeLocalStorage.set("lunadx_scans", JSON.stringify(updated));
   return true;
 }
