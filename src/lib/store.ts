@@ -1,4 +1,8 @@
-// src/lib/store.ts - Stable Frontend Store (No Backend Dependencies)
+// src/lib/store.ts - Stable Frontend Store (SAFE FOR VERCEL)
+
+// ─────────────────────────────
+// Types
+// ─────────────────────────────
 
 export type UserRole = "Admin" | "Radiologist" | "Clinician";
 
@@ -25,16 +29,19 @@ export interface Scan {
 }
 
 // ─────────────────────────────
-// Auth (simple demo mode)
+// Storage Keys
 // ─────────────────────────────
 
 const USER_KEY = "lunadx_current_user";
 const PATIENTS_KEY = "lunadx_patients";
 const SCANS_KEY = "lunadx_scans";
 
+// ─────────────────────────────
+// Auth
+// ─────────────────────────────
+
 export function getCurrentUser(): User {
   const raw = localStorage.getItem(USER_KEY);
-
   if (raw) return JSON.parse(raw);
 
   return {
@@ -62,7 +69,7 @@ export function logout() {
 }
 
 // ─────────────────────────────
-// Permissions (IMPORTANT - used by sidebar)
+// Permissions
 // ─────────────────────────────
 
 export function canUploadScans(role?: UserRole) {
@@ -113,9 +120,33 @@ export function getScanUsage() {
   };
 }
 
+export function saveScan(scan: any) {
+  const scans = getScans();
+
+  const newScan = {
+    id: crypto.randomUUID(),
+    createdAt: new Date().toISOString(),
+    ...scan,
+  };
+
+  scans.push(newScan);
+  localStorage.setItem(SCANS_KEY, JSON.stringify(scans));
+
+  return newScan;
+}
+
 // ─────────────────────────────
-// Organization (demo)
+// Organization
 // ─────────────────────────────
+
+export function getOrganization() {
+  return {
+    id: "org-1",
+    name: "LunaDX Demo Hospital",
+    location: "Demo",
+    plan: "trial",
+  };
+}
 
 export function createOrganization(data: {
   name: string;
@@ -144,70 +175,26 @@ export function createOrganization(data: {
 }
 
 // ─────────────────────────────
-// AI (placeholder safe fallback)
+// AI (mock safe fallback)
 // ─────────────────────────────
 
-export async function analyzeXray(imageDataUrl: string) {
+export async function analyzeXray() {
   return {
     pneumonia_probability: 0,
     tb_probability: 0,
     heatmap_overlay_url: null,
-    ai_summary: "Backend not connected (frontend-only mode)",
+    ai_summary: "Frontend mock mode - backend not connected",
   };
 }
 
 export function simulateAI() {
-  const tbRisk = Math.round(Math.random() * 40 + 5);
-  const pneumoniaRisk = Math.round(Math.random() * 50 + 10);
-  const lungOpacityRisk = Math.round(Math.random() * 30 + 5);
-  const pleuralEffusionRisk = Math.round(Math.random() * 20 + 2);
-  const lungNodulesRisk = Math.round(Math.random() * 15 + 1);
-
   return {
-    tbRisk,
-    pneumoniaRisk,
-    lungOpacityRisk,
-    pleuralEffusionRisk,
-    lungNodulesRisk,
-    findings: [
-      "No obvious acute consolidation",
-      "Lung fields appear largely clear",
-      "No large pleural effusion detected",
-    ],
-    suggestions: [
-      "Correlate clinically",
-      "Consider follow-up imaging if symptoms persist",
-    ],
-  };
-}
-
-// ─────────────────────────────
-// Scans
-// ─────────────────────────────
-
-export function saveScan(scan: any) {
-  const scans = JSON.parse(localStorage.getItem(SCANS_KEY) || "[]");
-
-  const newScan = {
-    id: crypto.randomUUID(),
-    createdAt: new Date().toISOString(),
-    ...scan,
-  };
-
-  scans.push(newScan);
-  localStorage.setItem(SCANS_KEY, JSON.stringify(scans));
-
-  return newScan;
-}
-
-// ─────────────────────────────
-// Organization (demo)
-// ─────────────────────────────
-
-export function getOrganization() {
-  return {
-    id: "org-1",
-    name: "LunaDX Demo Hospital",
-    plan: "trial",
+    tbRisk: 20,
+    pneumoniaRisk: 25,
+    lungOpacityRisk: 10,
+    pleuralEffusionRisk: 5,
+    lungNodulesRisk: 3,
+    findings: ["No acute abnormality detected"],
+    suggestions: ["Clinical correlation recommended"],
   };
 }
