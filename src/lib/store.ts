@@ -196,6 +196,13 @@ export function saveScan(scan: any) {
     ...scan,
   };
 
+  export function getOrganization() {
+  return {
+    id: "org-1",
+    name: "LunaDX Demo Hospital",
+    plan: "trial"
+  };
+}
   scans.push(newScan);
   localStorage.setItem(SCANS_KEY, JSON.stringify(scans));
 
