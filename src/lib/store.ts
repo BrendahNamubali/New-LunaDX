@@ -1,10 +1,4 @@
-// LunaDX Store (Stable Clean Version)
-
-const BACKEND = "/api";
-
-// ─────────────────────────────
-// Types
-// ─────────────────────────────
+// src/lib/store.ts - Stable Frontend Store (No Backend Dependencies)
 
 export type UserRole = "Admin" | "Radiologist" | "Clinician";
 
@@ -30,24 +24,13 @@ export interface Scan {
   result?: any;
 }
 
-export interface AIAnalysisResponse {
-  pneumonia_probability: number;
-  tb_probability: number;
-  heatmap_overlay_url: string | null;
-  ai_summary: string;
-}
-
 // ─────────────────────────────
-// Keys
+// Auth (simple demo mode)
 // ─────────────────────────────
 
 const USER_KEY = "lunadx_current_user";
 const PATIENTS_KEY = "lunadx_patients";
 const SCANS_KEY = "lunadx_scans";
-
-// ─────────────────────────────
-// Auth (demo-safe)
-// ─────────────────────────────
 
 export function getCurrentUser(): User {
   const raw = localStorage.getItem(USER_KEY);
@@ -79,7 +62,19 @@ export function logout() {
 }
 
 // ─────────────────────────────
-// Patients (FIXED EXPORTS)
+// Permissions (IMPORTANT - used by sidebar)
+// ─────────────────────────────
+
+export function canUploadScans(role?: UserRole) {
+  return role === "Admin" || role === "Radiologist";
+}
+
+export function canManageOrganization(role?: UserRole) {
+  return role === "Admin";
+}
+
+// ─────────────────────────────
+// Patients
 // ─────────────────────────────
 
 export function getPatients(): Patient[] {
@@ -100,57 +95,7 @@ export function deletePatient(id: string) {
 }
 
 // ─────────────────────────────
-// AI ANALYSIS (CLEAN)
-// ─────────────────────────────
-
-export async function analyzeXray(imageDataUrl: string): Promise<AIAnalysisResponse> {
-  try {
-    const HF_TOKEN = import.meta.env.VITE_HF_TOKEN;
-
-    const response = await fetch(
-      "https://api-inference.huggingface.co/models/keremberke/chest-xray-classification",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${HF_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          inputs: imageDataUrl,
-        }),
-      }
-    );
-
-    if (!response.ok) {
-      const err = await response.text();
-      console.error("HF error:", err);
-      throw new Error("Hugging Face request failed");
-    }
-
-    const result = await response.json();
-
-    // Normalize Hugging Face output
-    const top = Array.isArray(result) ? result[0] : result;
-
-    return {
-      pneumonia_probability: top?.label === "pneumonia" ? top?.score || 0 : 0,
-      tb_probability: top?.label === "tuberculosis" ? top?.score || 0 : 0,
-      heatmap_overlay_url: null,
-      ai_summary: `Prediction: ${top?.label || "unknown"} (${Math.round((top?.score || 0) * 100)}%)`,
-    };
-  } catch (err) {
-    console.error("AI failed:", err);
-
-    return {
-      pneumonia_probability: 0,
-      tb_probability: 0,
-      heatmap_overlay_url: null,
-      ai_summary: "AI analysis failed",
-    };
-  }
-}
-// ─────────────────────────────
-// SCANS (MISSING EXPORTS FIX)
+// Scans
 // ─────────────────────────────
 
 export function getScans(): Scan[] {
@@ -169,7 +114,44 @@ export function getScanUsage() {
 }
 
 // ─────────────────────────────
+// Organization (demo)
+// ─────────────────────────────
 
-export function canUploadScans(role?: UserRole) {
-  return role === "Admin" || role === "Radiologist";
+export function createOrganization(data: {
+  name: string;
+  location: string;
+  adminEmail: string;
+  adminName: string;
+  password: string;
+}) {
+  const user: User = {
+    id: "1",
+    name: data.adminName,
+    email: data.adminEmail,
+    role: "Admin",
+  };
+
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+
+  return {
+    org: {
+      id: "org-1",
+      name: data.name,
+      location: data.location,
+    },
+    user,
+  };
+}
+
+// ─────────────────────────────
+// AI (placeholder safe fallback)
+// ─────────────────────────────
+
+export async function analyzeXray(imageDataUrl: string) {
+  return {
+    pneumonia_probability: 0,
+    tb_probability: 0,
+    heatmap_overlay_url: null,
+    ai_summary: "Backend not connected (frontend-only mode)",
+  };
 }
