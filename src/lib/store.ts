@@ -180,3 +180,24 @@ export function simulateAI() {
     ],
   };
 }
+
+// ─────────────────────────────
+// Scans (required by UploadPage)
+// ─────────────────────────────
+
+export function saveScan(scan: any) {
+  const SCANS_KEY = "lunadx_scans";
+
+  const scans = JSON.parse(localStorage.getItem(SCANS_KEY) || "[]");
+
+  const newScan = {
+    id: crypto.randomUUID(),
+    createdAt: new Date().toISOString(),
+    ...scan,
+  };
+
+  scans.push(newScan);
+  localStorage.setItem(SCANS_KEY, JSON.stringify(scans));
+
+  return newScan;
+}
