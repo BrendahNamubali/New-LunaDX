@@ -6,11 +6,11 @@ import { useState } from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
-const getNavItems = (role?: string) => [
+const getNavItems = (role: string = "Clinician") => [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard", allowed: true },
   { to: "/patients", icon: Users, label: "Patients", allowed: true },
   { to: "/triage", icon: ClipboardList, label: "AI Triage Queue", allowed: true },
-  { to: "/upload", icon: Upload, label: "Screenings", allowed: canUploadScans(role as any) },
+  { to: "/upload", icon: Upload, label: "Screenings", allowed: canUploadScans(role) },
   { to: "/analytics", icon: BarChart3, label: "Analytics", allowed: true },
   { to: "/demo", icon: FlaskConical, label: "Demo Cases", allowed: true },
   { to: "/history", icon: FileText, label: "Audit Logs", allowed: true },
@@ -19,7 +19,12 @@ const getNavItems = (role?: string) => [
 ];
 
 function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
-  const user = getCurrentUser();
+  const user = getCurrentUser() ?? {
+  id: "temp",
+  name: "Guest",
+  email: "",
+  role: "Clinician",
+};
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -44,7 +49,7 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-0.5">
-        {getNavItems(user?.role).map((item) => (
+        {getNavItems(user.role).map((item) => (
           item.allowed ? (
             <NavLink
               key={item.to}
