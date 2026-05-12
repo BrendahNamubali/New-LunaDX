@@ -182,12 +182,10 @@ export function simulateAI() {
 }
 
 // ─────────────────────────────
-// Scans (required by UploadPage)
+// Scans
 // ─────────────────────────────
 
 export function saveScan(scan: any) {
-  const SCANS_KEY = "lunadx_scans";
-
   const scans = JSON.parse(localStorage.getItem(SCANS_KEY) || "[]");
 
   const newScan = {
@@ -196,15 +194,20 @@ export function saveScan(scan: any) {
     ...scan,
   };
 
-  export function getOrganization() {
-  return {
-    id: "org-1",
-    name: "LunaDX Demo Hospital",
-    plan: "trial"
-  };
-}
   scans.push(newScan);
   localStorage.setItem(SCANS_KEY, JSON.stringify(scans));
 
   return newScan;
+}
+
+// ─────────────────────────────
+// Organization (demo)
+// ─────────────────────────────
+
+export function getOrganization() {
+  return {
+    id: "org-1",
+    name: "LunaDX Demo Hospital",
+    plan: "trial",
+  };
 }
