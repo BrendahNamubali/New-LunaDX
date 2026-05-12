@@ -155,3 +155,28 @@ export async function analyzeXray(imageDataUrl: string) {
     ai_summary: "Backend not connected (frontend-only mode)",
   };
 }
+
+export function simulateAI() {
+  const tbRisk = Math.round(Math.random() * 40 + 5);
+  const pneumoniaRisk = Math.round(Math.random() * 50 + 10);
+  const lungOpacityRisk = Math.round(Math.random() * 30 + 5);
+  const pleuralEffusionRisk = Math.round(Math.random() * 20 + 2);
+  const lungNodulesRisk = Math.round(Math.random() * 15 + 1);
+
+  return {
+    tbRisk,
+    pneumoniaRisk,
+    lungOpacityRisk,
+    pleuralEffusionRisk,
+    lungNodulesRisk,
+    findings: [
+      "No obvious acute consolidation",
+      "Lung fields appear largely clear",
+      "No large pleural effusion detected",
+    ],
+    suggestions: [
+      "Correlate clinically",
+      "Consider follow-up imaging if symptoms persist",
+    ],
+  };
+}
