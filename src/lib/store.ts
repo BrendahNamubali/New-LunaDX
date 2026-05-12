@@ -198,3 +198,14 @@ export function simulateAI() {
     suggestions: ["Clinical correlation recommended"],
   };
 }
+
+export function updateScanNotes(scanId: string, notes: string) {
+  const scans = JSON.parse(localStorage.getItem("lunadx_scans") || "[]");
+
+  const updated = scans.map((s: any) =>
+    s.id === scanId ? { ...s, notes } : s
+  );
+
+  localStorage.setItem("lunadx_scans", JSON.stringify(updated));
+  return true;
+}
